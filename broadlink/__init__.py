@@ -539,17 +539,17 @@ class S1C(device):
       payload = aes.decrypt(bytes(response[0x38:]))
       if payload:
         head = payload[:4]
-        count = payload[0x4] #need to fix for python 2.x
+        count = payload[0x4]
         sensors = payload[0x6:]
-        sensors_a = [bytearray(sensors[i * 83:(i + 1) * 83]) for i in range(len(sensors) // 83)]
+        sensors_a = [sensors[i * 83:(i + 1) * 83] for i in range(len(sensors) // 83)]
 
         sens_res = []
         for sens in sensors_a:
-          status = ord(chr(sens[0]))
-          _name = str(bytes(sens[4:26]).decode())
-          _order = ord(chr(sens[1]))
-          _type = ord(chr(sens[3]))
-          _serial = bytes(codecs.encode(sens[26:30],"hex")).decode()
+          status = sens[0]  # & 0x4
+          _name = str(sens[4:26], 'UTF-8')
+          _order = sens[1]
+          _type = sens[3]
+          _serial = str(codecs.encode(sens[26:30], 'hex'), 'UTF-8')
 
           type_str = S1C_SENSORS_TYPES.get(_type, 'Unknown')
 
